@@ -1,0 +1,4 @@
+.idea
+.byebug_history
+broken/**/*.png
+fixed/**/*.png
