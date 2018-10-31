@@ -3,12 +3,12 @@
 # #require 'chunky_png'
 require 'oily_png'
 require 'byebug'
-require 'CSV'
+require 'csv'
 
 folder = ARGV[0]
 output_folder = ARGV[1]
 csv_file = ARGV[2]
-column = ARGV[3].to_i unless ARGV[3].nil?
+column = ARGV[3].to_i - 1 unless ARGV[3].nil?
 
 if ARGV.count() < 4
   puts "ensure source-folder destination-folder csv-containing-file-names-and-destination-subfolder-mapping column-number"
@@ -46,9 +46,11 @@ CSV.foreach(csv_file) do |row|
   next if row_num <= 2 # skip first 2 rows
 
   filename = row[column]
-  if filename.include?(filename)
+  if filename_list.include?(filename)
     puts "duplicate filename: #{filename} in row #{row_num} -- skipping"
     next
+  else
+    filename_list << filename
   end
 
   if column > 0
@@ -59,7 +61,7 @@ CSV.foreach(csv_file) do |row|
   output_path += "/" unless output_path.end_with?("/")
 
   # locate file in source folder (assumed to be broken [or unprocessed])
-  broken_name = Dir.glob("#{folder}/**/#{filename}")
+  broken_name = Dir.glob("#{folder}**/#{filename}")[0]
   next if !broken_name.to_s.include?(".png")
 
   puts
