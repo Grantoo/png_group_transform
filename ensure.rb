@@ -9,12 +9,14 @@ folder = ARGV[0]
 output_folder = ARGV[1]
 csv_file = ARGV[2]
 column = ARGV[3].to_i - 1 unless ARGV[3].nil?
+column_path ARGV[4].to_i -1 unless ARGV[4].nil?
 
-if ARGV.count() < 4
-  puts "ensure source-folder destination-folder csv-containing-file-names-and-destination-subfolder-mapping column-number"
+if ARGV.count() < 5
+  puts "ensure source-folder destination-folder csv-containing-file-names-and-destination-subfolder-mapping file-column-number path-column-number"
   puts "  Will scour the source-folder for filenames contained in CSV"
   puts "  Will convert the filename and place in destination folder within subfolder"
-  puts "  column-number specifies column in CSV that contains filenames - assumes that next column contains subfolder mappings, and previous column to contain a 'skip processing' boolean"
+  puts "  file-column-number specifies column in CSV that contains input filenames - assumes that previous column to contain a 'skip processing' boolean"
+  puts "  path-column-number specifies column in CSV that contains output path"
   puts "  Will identify any duplicate file names"
   puts "  Will identify missing files given file names"
   puts "  starts processing CSV on row 3 (2 header rows)"
@@ -57,7 +59,7 @@ CSV.foreach(csv_file) do |row|
     next if row[column - 1].to_s == 'true' or row[column - 1].to_s == 'TRUE'
   end
 
-  output_path = row[column + 1]
+  output_path = row[column_path]
   output_path += "/" unless output_path.end_with?("/")
 
   # locate file in source folder (assumed to be broken [or unprocessed])
