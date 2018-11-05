@@ -66,7 +66,16 @@ CSV.foreach(csv_file) do |row|
   output_path += "/" unless output_path.end_with?("/")
 
   # locate file in source folder (assumed to be broken [or unprocessed])
-  broken_name = Dir.glob("#{folder}**/#{filename}")[0]
+  broken_names = Dir.glob("#{folder}**/#{filename}")
+  # if multiples files are found output them
+  if broken_names.count > 1
+    puts "*********** duplicate sources found! ***************"
+    broken_names.each do |name|
+      puts name
+    end
+    puts "****************************************************"
+  end
+  broken_name = broken_names[0]
   next if !broken_name.to_s.include?(".png")
 
   puts
