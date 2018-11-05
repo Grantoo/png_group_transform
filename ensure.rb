@@ -44,6 +44,7 @@ end
 
 filename_list = []
 duplicates = []
+source_duplicates = []
 row_num = 0
 CSV.foreach(csv_file) do |row|
   row_num += 1
@@ -72,6 +73,7 @@ CSV.foreach(csv_file) do |row|
     puts "*********** duplicate sources found! ***************"
     broken_names.each do |name|
       puts name
+      source_duplicates << name
     end
     puts "****************************************************"
   end
@@ -197,7 +199,7 @@ CSV.foreach(csv_file) do |row|
     y_offset += (h + y_offset) - y_max
   end
 
-  bigger = ChunkyPNG::Image.new(x_max + x_offset + (pixel_buffer * 2), y_max + y_offset + (pixel_buffer * 2), ChunkyPNG::Color::TRANSPARENT)
+  bigger = ChunkyPNG::Image.new(x_max + x_offset + (pixel_buffer * 2), y_max + y_offset + (pixel_buffer * 2) + 1, ChunkyPNG::Color::TRANSPARENT)
   puts "bigger canvas is x=#{bigger.width} y=#{bigger.height}"
   puts "old canvas is x=#{broken.width} y=#{broken.height} at #{x_offset_start},#{y_offset_start}"
   broken = bigger.compose(broken,x_offset_start + pixel_buffer,y_offset_start + pixel_buffer)
@@ -219,6 +221,15 @@ CSV.foreach(csv_file) do |row|
 
   # write out to file
   broken.save(output_folder + output_path + filename)
+end
+
+# outpus source duplicates
+if source_duplicates.count > 0
+  puts
+  puts " -------------- duplicate sources found! --------------"
+  source_duplicates.each do |name|
+    puts name
+  end
 end
 
 # output duplicate file names
