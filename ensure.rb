@@ -4,12 +4,13 @@
 require 'oily_png'
 require 'byebug'
 require 'csv'
+require 'pathname'
 
 folder = ARGV[0]
 output_folder = ARGV[1]
 csv_file = ARGV[2]
 column = ARGV[3].to_i - 1 unless ARGV[3].nil?
-column_path ARGV[4].to_i -1 unless ARGV[4].nil?
+column_path = ARGV[4].to_i - 1 unless ARGV[4].nil?
 
 if ARGV.count() < 5
   puts "ensure source-folder destination-folder csv-containing-file-names-and-destination-subfolder-mapping file-column-number path-column-number"
@@ -42,6 +43,7 @@ def self.create_dir_if_not_exists(path)
 end
 
 filename_list = []
+duplicates = []
 row_num = 0
 CSV.foreach(csv_file) do |row|
   row_num += 1
@@ -50,6 +52,7 @@ CSV.foreach(csv_file) do |row|
   filename = row[column]
   if filename_list.include?(filename)
     puts "duplicate filename: #{filename} in row #{row_num} -- skipping"
+    duplicates << "duplicate filename: #{filename} in row #{row_num} -- skipping"
     next
   else
     filename_list << filename
@@ -209,3 +212,21 @@ CSV.foreach(csv_file) do |row|
   broken.save(output_folder + output_path + filename)
 end
 
+# output duplicate file names
+if duplicates.count > 0
+  puts
+  puts " -------------- duplicate file names ----------------"
+  duplicates.each do |name|
+    puts name
+  end
+end
+
+# look for PNGs not used or included in the CSV in the source folder
+puts
+puts " -------------- source folder files not in CSV ----------------"
+Dir.glob("#{folder}**/*.png").each do |pathname|
+  names = Pathname(pathname).each_filename.to_a
+  if !filename_list.include?(names[-1])
+    puts names[-1]
+  end
+end
