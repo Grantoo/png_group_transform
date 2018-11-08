@@ -2,12 +2,14 @@ This is an example of a simple tool to tranform PNG files to ensure that solid c
 Also cleans garbage transparency data.
 
 Usage
-./ensure source-folder destination-folder content-csv filename-column path-column
+./ensure source-folder destination-folder content-csv filename-column path-column (scale%)
 
 source folder is a file structure that contains all images that are named in the content csv
 destination folder is a new folder structure that will be created given the content in the content csv
 filename-column specifies which column contains the png filename
 path-column specifies which column contains the output path for the processed filename
+scale *optional* an integer between 1 and 100 
+    *requires mogrify installed on your system (part of ImageMagick)
 
 assumes 2 rows as headers
 

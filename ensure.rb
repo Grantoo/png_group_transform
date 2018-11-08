@@ -5,15 +5,20 @@ require 'oily_png'
 require 'byebug'
 require 'csv'
 require 'pathname'
+require 'mini_magick'
 
 folder = ARGV[0]
 output_folder = ARGV[1]
 csv_file = ARGV[2]
 column = ARGV[3].to_i - 1 unless ARGV[3].nil?
 column_path = ARGV[4].to_i - 1 unless ARGV[4].nil?
+scale = nil
+if ARGV[5]
+  scale = ARGV[5].to_i # 1-100
+end
 
 if ARGV.count() < 5
-  puts "ensure source-folder destination-folder csv-containing-file-names-and-destination-subfolder-mapping file-column-number path-column-number"
+  puts "ensure source-folder destination-folder csv-containing-file-names-and-destination-subfolder-mapping file-column-number path-column-number (scale)"
   puts "  Will scour the source-folder for filenames contained in CSV"
   puts "  Will convert the filename and place in destination folder within subfolder"
   puts "  file-column-number specifies column in CSV that contains input filenames - assumes that previous column to contain a 'skip processing' boolean"
@@ -21,6 +26,7 @@ if ARGV.count() < 5
   puts "  Will identify any duplicate file names"
   puts "  Will identify missing files given file names"
   puts "  starts processing CSV on row 3 (2 header rows)"
+  puts "  *optional - will using ImageMagick to scale/100 if scale is added as a parameter (% integer from 1-100)"
   exit
 end
 
@@ -221,6 +227,14 @@ CSV.foreach(csv_file) do |row|
 
   # write out to file
   broken.save(output_folder + output_path + filename)
+
+  # if scaling is needed
+  if !scale.nil?
+    image_to_scale = MiniMagick::Image.open(output_folder + output_path + filename)
+    puts "scaling to #{scale}%"
+    image_to_scale.scale("#{scale}%")
+    image_to_scale.write(output_folder + output_path + filename) # overwrite
+  end
 end
 
 # outpus source duplicates
